@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cleanstat Dispatch Board</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f7f6;
+      --ink: #16201d;
+      --muted: #66736d;
+      --line: #cbd8d2;
+      --panel: #ffffff;
+      --accent: #b8730a;
+      --accent-2: #146c63;
+      --ok: #16705a;
+      --shadow: 0 10px 28px rgba(63, 45, 25, .11);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Arial, "Tahoma", sans-serif;
+      line-height: 1.45;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(244, 247, 246, .94);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 14px 14px 10px;
+    }
+    .eyebrow {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    h1 {
+      margin: 5px 0 10px;
+      font-size: 28px;
+      line-height: 1.12;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 10px;
+      min-width: 0;
+    }
+    .metric .label {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .metric .value {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    nav {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 14px 12px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+    }
+    nav a {
+      flex: 0 0 auto;
+      text-decoration: none;
+      color: var(--ink);
+      background: #e4ece8;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    nav a.active { background: var(--ink); color: #fffaf1; }
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 14px;
+    }
+    .notice {
+      margin: 0 0 14px;
+      padding: 10px 12px;
+      border-left: 4px solid var(--accent-2);
+      background: #edf5f7;
+      color: #214556;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    section.zone {
+      margin: 0 0 18px;
+      scroll-margin-top: 180px;
+    }
+    .zone-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 2px solid var(--ink);
+      padding: 7px 0;
+      margin-bottom: 10px;
+    }
+    .zone-title {
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .zone-meta {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: right;
+    }
+    .customers {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 10px;
+    }
+    article {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 12px;
+    }
+    .customer-top {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .customer-name {
+      font-size: 17px;
+      font-weight: 800;
+    }
+    .subzone {
+      color: var(--accent-2);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+    .qty {
+      background: #1f1b16;
+      color: #fffaf1;
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0;
+    }
+    li {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 7px 0;
+      border-top: 1px solid #e3ece8;
+      font-size: 13px;
+    }
+    li .item-name { min-width: 0; }
+    li .item-qty {
+      color: var(--ok);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .empty {
+      color: var(--muted);
+      padding: 16px 0;
+      font-size: 14px;
+    }
+    footer {
+      max-width: 980px;
+      margin: 8px auto 30px;
+      padding: 0 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    @media (max-width: 640px) {
+      h1 { font-size: 24px; }
+      .summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .metric { padding: 8px; }
+      .metric .value { font-size: 18px; }
+      .metric .label { font-size: 10px; }
+      main { padding: 12px 10px; }
+      .customers { grid-template-columns: 1fr; }
+      section.zone { scroll-margin-top: 170px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="eyebrow"><span>Cleanstat Dispatch</span><span>2026-09-14 10:34</span></div>
+      <h1>ใบวางแผนจัดส่ง</h1>
+      <div class="summary">
+        <div class="metric"><div class="label">วันที่จัดส่ง</div><div class="value">จันทร์ 14 ก.ย. 2026</div></div>
+        <div class="metric"><div class="label">ลูกค้า</div><div class="value" id="totalCustomers"></div></div>
+        <div class="metric"><div class="label">รวม CTN</div><div class="value" id="totalCtn"></div></div>
+      </div>
+    </div>
+    <nav id="zoneNav"></nav>
+  </header>
+  <main>
+    <p class="notice">ข้อมูลจาก INV_DAILY.xlsx รอบล่าสุด แสดงเฉพาะงานวันที่ จันทร์ 14 ก.ย. 2026</p>
+    <div id="board"></div>
+  </main>
+  <footer>Generated 2026-09-14 10:34 from INV_DAILY.xlsx</footer>
+  <script>
+    const DATA = {"generated_at": "2026-09-14 10:34", "target_date": "2026-09-14", "target_date_label": "จันทร์ 14 ก.ย. 2026", "total_customers": 21, "total_ctn": 366.0, "total_ctn_label": "366 ลัง", "zones": [{"zone": "AY", "customer_count": 11, "total_ctn": 136.0, "total_ctn_label": "136 ลัง", "non_ctn": [], "customers": [{"name": "Fabrinet", "subzone": "Klongluang", "ctn": 1.0, "total": "1 ลัง", "items": [{"label": "หน้ากากอนามัย (Face Mask) - 2PLY", "qty": "1 ลัง", "lines": 1}]}, {"name": "Federal-Mogul", "subzone": "", "ctn": 1.0, "total": "1 ลัง", "items": [{"label": "ถุงมือ (Glove) - NITRILE", "qty": "1 ลัง", "lines": 1}]}, {"name": "Feiti", "subzone": "UTHAI", "ctn": 17.0, "total": "17 ลัง", "items": [{"label": "ถุงมือ (Glove) - NITRILE (3 รายการ)", "qty": "17 ลัง", "lines": 1}]}, {"name": "Fujikura Electronics", "subzone": "NHONG KI", "ctn": 0.0, "total": "10 BTL", "items": [{"label": "น้ำยาทำความสะอาด (Cleaner)", "qty": "10 BTL", "lines": 1}, {"label": "หน้ากากอนามัย (Face Mask) - 3PLY", "qty": "–", "lines": 1}]}, {"name": "Furukawa Fitel", "subzone": "UTHAI", "ctn": 0.0, "total": "8 PACK", "items": [{"label": "กระดาษคลีนรูม A3/A4 (Cleanroom Paper)", "qty": "8 PACK", "lines": 1}]}, {"name": "Iscm Technology", "subzone": "THANU", "ctn": 12.0, "total": "12 ลัง", "items": [{"label": "ถุงมือ (Glove) - NITRILE", "qty": "12 ลัง", "lines": 1}]}, {"name": "Katayama Micronics Precision", "subzone": "BANCHANG", "ctn": 2.0, "total": "2 ลัง", "items": [{"label": "ถุงมือ (Glove) - LATEX", "qty": "1 ลัง", "lines": 1}, {"label": "ถุงมือ (Glove) - NITRILE", "qty": "1 ลัง", "lines": 1}]}, {"name": "Nidec Electronics", "subzone": "Amata", "ctn": 4.0, "total": "4 ลัง", "items": [{"label": "แผ่นกาว / แผ่นปูโต๊ะ (Mat)", "qty": "3 ลัง", "lines": 1}, {"label": "หน้ากาก (Mask) - CARBON", "qty": "1 ลัง", "lines": 1}]}, {"name": "NMB - Minebea Thai", "subzone": "CHIANG RAK-NOI", "ctn": 79.0, "total": "79 ลัง + 90 PCS", "items": [{"label": "ถุงมือ (Glove) - NITRILE (4 รายการ)", "qty": "69 ลัง", "lines": 1}, {"label": "หมวกคลุมผม (Mop Cap)", "qty": "1 ลัง", "lines": 1}, {"label": "ผ้าเช็ด Non-Woven (Wiper - NW)", "qty": "1 ลัง", "lines": 1}, {"label": "หน้ากากอนามัย (Face Mask) - 2PLY", "qty": "3 ลัง", "lines": 1}, {"label": "ผ้าเช็ด (Wiper)", "qty": "1 ลัง", "lines": 1}, {"label": "ผ้าเช็ด (Wiper) - POLYESTER (4 รายการ)", "qty": "4 ลัง + 90 PCS", "lines": 1}]}, {"name": "Sam Precision", "subzone": "UTHAI", "ctn": 12.0, "total": "12 ลัง", "items": [{"label": "ถุงมือ (Glove) - NITRILE (2 รายการ)", "qty": "12 ลัง", "lines": 1}]}, {"name": "Swarovski Manufacturing", "subzone": "Bang pa-in", "ctn": 8.0, "total": "8 ลัง", "items": [{"label": "หน้ากากอนามัย (Face Mask) - 3PLY", "qty": "8 ลัง", "lines": 1}]}]}, {"zone": "SMP", "customer_count": 0, "total_ctn": 0.0, "total_ctn_label": "0 ลัง", "non_ctn": [], "customers": []}, {"zone": "CB", "customer_count": 4, "total_ctn": 185.0, "total_ctn_label": "185 ลัง", "non_ctn": [], "customers": [{"name": "Celestica", "subzone": "", "ctn": 75.0, "total": "75 ลัง", "items": [{"label": "หน้ากาก (Mask) - CARBON", "qty": "54 ลัง", "lines": 1}, {"label": "ถุงมือ (Glove) - NITRILE", "qty": "20 ลัง", "lines": 1}, {"label": "ผ้าเช็ดทั่วไป (Wiper)", "qty": "1 ลัง", "lines": 1}]}, {"name": "Fabrinet", "subzone": "Klongluang", "ctn": 70.0, "total": "70 ลัง", "items": [{"label": "ถุงมือ (Glove) - NITRILE (3 รายการ)", "qty": "70 ลัง", "lines": 1}]}, {"name": "First Material Science", "subzone": "Bangbung331", "ctn": 6.0, "total": "6 ลัง + 6000 PRS", "items": [{"label": "ถุงมือ (Glove)", "qty": "6000 PRS", "lines": 1}, {"label": "ถุงมือ (Glove) - NITRILE", "qty": "4 ลัง", "lines": 1}, {"label": "หน้ากากอนามัย (Face Mask) - 3PLY", "qty": "2 ลัง", "lines": 1}]}, {"name": "Transitions Optical", "subzone": "Eastern", "ctn": 34.0, "total": "34 ลัง", "items": [{"label": "ถุงมือ (Glove) - NITRILE (2 รายการ)", "qty": "10 ลัง", "lines": 1}, {"label": "ถุงมือ (Glove) - LATEX", "qty": "22 ลัง", "lines": 1}, {"label": "หมวกคลุมผม - สำเร็จรูป (Mop Cap)", "qty": "2 ลัง", "lines": 1}]}]}, {"zone": "RY", "customer_count": 3, "total_ctn": 24.0, "total_ctn_label": "24 ลัง", "non_ctn": [], "customers": [{"name": "Donaldson", "subzone": "MABYANGPORN", "ctn": 0.0, "total": "50 PCS", "items": [{"label": "ชุดคลีนรูม / เสื้อผ้า (Garment)", "qty": "50 PCS", "lines": 1}]}, {"name": "Mitsubishi Electric Thai Auto-Parts", "subzone": "Eastern", "ctn": 7.0, "total": "7 ลัง", "items": [{"label": "แผ่นกาว / แผ่นปูโต๊ะ (Mat)", "qty": "1 ลัง", "lines": 1}, {"label": "หน้ากาก (Mask) - CARBON", "qty": "5 ลัง", "lines": 1}, {"label": "ผ้าเช็ด (Wiper)", "qty": "1 ลัง", "lines": 1}]}, {"name": "Vantive Manufacturing", "subzone": "PLUAKDAENG", "ctn": 17.0, "total": "17 ลัง", "items": [{"label": "หมวกคลุมผม - สำเร็จรูป (Mop Cap)", "qty": "17 ลัง", "lines": 1}]}]}, {"zone": "LB", "customer_count": 0, "total_ctn": 0.0, "total_ctn_label": "0 ลัง", "non_ctn": [], "customers": []}, {"zone": "PB", "customer_count": 1, "total_ctn": 7.0, "total_ctn_label": "7 ลัง", "non_ctn": [], "customers": [{"name": "Fujikura Electronics", "subzone": "NHONG KI", "ctn": 7.0, "total": "7 ลัง", "items": [{"label": "หน้ากากอนามัย (Face Mask) - 3PLY", "qty": "7 ลัง", "lines": 1}]}]}, {"zone": "BK", "customer_count": 1, "total_ctn": 14.0, "total_ctn_label": "14 ลัง", "non_ctn": [], "customers": [{"name": "Interpharma Plc", "subzone": "Suriyawonge", "ctn": 14.0, "total": "14 ลัง", "items": [{"label": "ถุงมือ (Glove) - NITRILE", "qty": "14 ลัง", "lines": 1}]}]}, {"zone": "KR", "customer_count": 1, "total_ctn": 0.0, "total_ctn_label": "0 ลัง", "non_ctn": [], "customers": [{"name": "Kyocera Avx Components (Bangkok)", "subzone": "NA-KLANG", "ctn": 0.0, "total": "30 PCS", "items": [{"label": "ชุดคลีนรูม / เสื้อผ้า (Garment)", "qty": "30 PCS", "lines": 1}]}]}, {"zone": "OT", "customer_count": 0, "total_ctn": 0.0, "total_ctn_label": "0 ลัง", "non_ctn": [], "customers": []}]};
+    const board = document.getElementById('board');
+    const nav = document.getElementById('zoneNav');
+    document.getElementById('totalCustomers').textContent = DATA.total_customers + ' ราย';
+    document.getElementById('totalCtn').textContent = DATA.total_ctn_label;
+
+    DATA.zones.forEach((zone, index) => {
+      const link = document.createElement('a');
+      link.href = '#zone-' + zone.zone;
+      link.textContent = zone.zone + ' ' + zone.customer_count;
+      if (index === 0) link.className = 'active';
+      nav.appendChild(link);
+
+      const section = document.createElement('section');
+      section.className = 'zone';
+      section.id = 'zone-' + zone.zone;
+      section.innerHTML = `
+        <div class="zone-head">
+          <div class="zone-title">Zone: ${zone.zone}</div>
+          <div class="zone-meta">${zone.customer_count} ราย / ${zone.total_ctn_label}${zone.non_ctn.length ? '<br>' + zone.non_ctn.join(' + ') : ''}</div>
+        </div>
+        <div class="customers"></div>
+      `;
+      const customerWrap = section.querySelector('.customers');
+      if (!zone.customers.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'ไม่มีงานจัดส่ง';
+        customerWrap.appendChild(empty);
+      }
+      zone.customers.forEach((customer) => {
+        const article = document.createElement('article');
+        const subzone = customer.subzone ? `<div class="subzone">ตำแหน่ง: ${customer.subzone}</div>` : '';
+        const items = customer.items.map((item) => `
+          <li>
+            <span class="item-name">${item.label}${item.lines > 1 ? ' (' + item.lines + ' รายการ)' : ''}</span>
+            <span class="item-qty">${item.qty}</span>
+          </li>
+        `).join('');
+        article.innerHTML = `
+          <div class="customer-top">
+            <div><div class="customer-name">${customer.name}</div>${subzone}</div>
+            <div class="qty">${customer.total}</div>
+          </div>
+          <ul>${items}</ul>
+        `;
+        customerWrap.appendChild(article);
+      });
+      board.appendChild(section);
+    });
+
+    const links = Array.from(nav.querySelectorAll('a'));
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      links.forEach((link) => link.classList.toggle('active', link.getAttribute('href') === '#' + visible.target.id));
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: [0, .25, .5, .75, 1] });
+    document.querySelectorAll('section.zone').forEach((section) => observer.observe(section));
+  </script>
+</body>
+</html>
