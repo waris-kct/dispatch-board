@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dispatch Board — T+1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FAF6EF;--surface:#FFFFFF;--surface-2:#F1EAD9;--surface-3:#E7DEC9;--border:#E0D5BE;--border-strong:#CBBB98;--text:#211C15;--text-dim:#6E6252;--text-faint:#9C8F79;--accent:#B8730A;--accent-ink:#FFFFFF;--danger:#B3261E;--shadow:0 1px 2px rgba(33,28,21,.06),0 6px 16px -8px rgba(33,28,21,.18);--zone-1:#2E6E62;--zone-2:#4A5FA5;--zone-3:#A5484A;--zone-4:#7A5A9E;--zone-5:#B8730A;--zone-6:#4F7C3C;--zone-7:#A0567E;--zone-8:#3D7A96;--zone-9:#8A6A3D;--zone-10:#8C4F6E}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1B1712;--surface:#24201A;--surface-2:#2C2620;--surface-3:#362F26;--border:#3B342A;--border-strong:#4C4335;--text:#F3ECDE;--text-dim:#B3A791;--text-faint:#7C7261;--accent:#F5A623;--accent-ink:#1B1712;--danger:#F2726B;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 20px -8px rgba(0,0,0,.5);--zone-1:#5BB8A4;--zone-2:#8B9EE8;--zone-3:#E38A83;--zone-4:#B79BE0;--zone-5:#F5A623;--zone-6:#8FC46A;--zone-7:#E093BC;--zone-8:#6FC0E0;--zone-9:#D1A968;--zone-10:#D189A8}}
+:root[data-theme="dark"]{--bg:#1B1712;--surface:#24201A;--surface-2:#2C2620;--surface-3:#362F26;--border:#3B342A;--border-strong:#4C4335;--text:#F3ECDE;--text-dim:#B3A791;--text-faint:#7C7261;--accent:#F5A623;--accent-ink:#1B1712;--danger:#F2726B;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 20px -8px rgba(0,0,0,.5);--zone-1:#5BB8A4;--zone-2:#8B9EE8;--zone-3:#E38A83;--zone-4:#B79BE0;--zone-5:#F5A623;--zone-6:#8FC46A;--zone-7:#E093BC;--zone-8:#6FC0E0;--zone-9:#D1A968;--zone-10:#D189A8}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:"IBM Plex Sans Thai","IBM Plex Sans",system-ui,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:24px}
+.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:640px;margin:0 auto}
+.topbar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border);padding:14px 16px 12px}
+.topbar-eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.topbar-title{font-family:"Kanit",sans-serif;font-size:20px;font-weight:700}
+.topbar-sub{color:var(--text-dim);font-size:12.5px;margin-top:2px}
+.refresh-hint{color:var(--accent);font-size:11.5px;font-weight:600;margin-top:6px}
+.topbar-warn{color:var(--danger);font-weight:700}
+.topbar-stats{display:flex;gap:18px;margin-top:10px}
+.stat{display:flex;flex-direction:column}
+.stat-value{font-family:"Kanit",sans-serif;font-weight:700;font-size:22px;line-height:1.1}
+.stat-label{font-size:11px;color:var(--text-faint);margin-top:1px}
+.stat-value.accent{color:var(--accent)}
+.zoneCard{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin:10px 16px;overflow:hidden;box-shadow:var(--shadow)}
+.zoneHead{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;width:100%;text-align:left;color:inherit;font:inherit}
+.zoneChip{flex-shrink:0;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:"Kanit",sans-serif;font-weight:700;font-size:13px;color:#fff}
+.zoneHeadBody{flex:1;min-width:0}
+.zoneName{font-weight:600;font-size:14.5px}
+.zoneMeta{font-size:12px;color:var(--text-dim);margin-top:1px}
+.zoneCTN{font-family:"Kanit",sans-serif;font-weight:700;font-size:18px;flex-shrink:0}
+.zoneCTN small{display:block;font-family:"IBM Plex Sans Thai",sans-serif;font-weight:500;font-size:10px;color:var(--text-faint);text-align:right}
+.chev{flex-shrink:0;color:var(--text-faint);transition:transform .18s ease}
+.zoneCard.open .chev{transform:rotate(180deg)}
+.zoneBody{display:none;border-top:1px solid var(--border)}
+.zoneCard.open .zoneBody{display:block}
+.custRow{padding:11px 14px;border-bottom:1px solid var(--border)}
+.custRow:last-child{border-bottom:none}
+.custRow.empty{color:var(--text-faint);font-size:12.5px;text-align:center;padding:16px 14px}
+.custTop{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.custName{font-weight:600;font-size:13.5px}
+.subzoneHead{padding:9px 14px 3px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--accent);background:var(--surface-2)}
+.custCTN{font-size:12.5px;font-weight:600;color:var(--accent);flex-shrink:0;white-space:nowrap}
+.itemLine{font-size:12px;color:var(--text-dim);margin-top:3px}
+.itemLine .qty{color:var(--text);font-weight:500;float:right;padding-left:8px}
+.footer{padding:16px;text-align:center;color:var(--text-faint);font-size:11px}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap">
+<div class="topbar-eyebrow">Dispatch Plan T+1 · แผนจัดส่ง</div>
+<div class="topbar-title">จันทร์ 21 ก.ย. 2026</div>
+<div class="topbar-sub">แผนจัดส่งจริง (T+1)</div>
+<div class="refresh-hint">↻ เห็นวันที่เก่า? กดรีเฟรชหน้าเว็บ</div>
+<div class="topbar-stats">
+<div class="stat"><div class="stat-value">24</div><div class="stat-label">ลูกค้า</div></div>
+<div class="stat"><div class="stat-value accent">500</div><div class="stat-label">ลัง (CTN)</div></div>
+</div>
+</div></div>
+<div id="app" class="wrap"></div>
+<div class="footer">อัปเดตล่าสุด 2026-09-18 16:44</div>
+<script>
+const ZONE_META={AY:{name:"อยุธยา",color:"var(--zone-1)"},SMP:{name:"สมุทรปราการ",color:"var(--zone-2)"},CB:{name:"ชลบุรี",color:"var(--zone-3)"},RY:{name:"ระยอง",color:"var(--zone-4)"},LB:{name:"ลพบุรี",color:"var(--zone-6)"},PB:{name:"ปทุมธานี",color:"var(--zone-7)"},BK:{name:"กรุงเทพฯ",color:"var(--zone-8)"},KR:{name:"โคราช",color:"var(--zone-9)"},OT:{name:"อื่นๆ",color:"var(--zone-5)"},PRJ:{name:"ปราจีนบุรี",color:"var(--zone-10)"}};
+const DATA=[{zone:"AY",subzoneGroups:[{subzone:"Bang pa-in",customers:[{name:"Swarovski Manufacturing",ctn:"16 ลัง",items:[["ถุงมือ (Glove) - LATEX","8 ลัง"],["หน้ากากอนามัย (Face Mask) - 3PLY","8 ลัง"]]}]},{subzone:"BANGKRASAN",customers:[{name:"Nok Precision Component",ctn:"5 ลัง",items:[["ผ้าเช็ด (Wiper) - POLYESTER","5 ลัง"]]}]},{subzone:"Banglen(NKPT)",customers:[{name:"Qual-Pro",ctn:"2 ลัง",items:[["ผ้าเช็ด (Wiper) - POLYESTER","2 ลัง"]]}]},{subzone:"BANLEN",customers:[{name:"Hoya Lens Thailand",ctn:"6 ลัง",items:[["ถุงมือ (Glove) - NITRILE","3 ลัง"],["ผ้าเช็ด (Wiper)","3 ลัง"]]}]},{subzone:"BOTALO",customers:[{name:"Miss Wisanee Thaithong",ctn:"2 ลัง",items:[["ถุงมือ (Glove) - LATEX","2 BOX"],["หน้ากากอนามัย (Face Mask) - 3PLY (2 รายการ)","2 ลัง"]]}]},{subzone:"KANHAM",customers:[{name:"NMB - Minebea Thai",ctn:"37 ลัง",items:[["ถุงมือ (Glove) - NITRILE (6 รายการ)","32 ลัง"],["ผ้าเช็ด Non-Woven (Wiper - NW)","1 ลัง"],["ผ้าเช็ด (Wiper) - POLYESTER (2 รายการ)","4 ลัง"]]},{name:"Pioneer Manufacturing",ctn:"8 ลัง",items:[["หน้ากากอนามัย (Face Mask) - 3PLY","3 ลัง"],["หน้ากากอนามัย (Face Mask) - CARBON","1 ลัง"],["หมวกคลุมผม - สำเร็จรูป (Mop Cap)","4 ลัง"]]}]},{subzone:"Klongluang",customers:[{name:"Belton Industrial",ctn:"36 ลัง",items:[["ถุงมือ (Glove) - NITRILE (2 รายการ)","26 ลัง"],["หน้ากากอนามัย (Face Mask) - 3PLY","10 ลัง"]]}]},{subzone:"LAMSAI",customers:[{name:"Magnecomp Precision Technology Pcl",ctn:"5 ลัง",items:[["หน้ากากอนามัย (Face Mask) - 3PLY","5 ลัง"]]}]},{subzone:"RANGSIT",customers:[{name:"Nidec Electronics",ctn:"1 ลัง",items:[["แผ่นกาว / แผ่นปูโต๊ะ (Mat)","50 MAT"],["หน้ากากอนามัย (Face Mask) - CARBON","1 ลัง"],["เทป (Tape)","6 PCS"]]}]}]},{zone:"SMP",subzoneGroups:[]},{zone:"CB",subzoneGroups:[{subzone:"⚠ REVIEW - Cannot parse Tambon",customers:[{name:"Celestica",ctn:"250 ลัง",items:[["ถุงมือ (Glove) - LATEX","10 ลัง"],["ถุงมือ (Glove) - CARBON","50 ลัง"],["ถุงมือ (Glove) - NITRILE (3 รายการ)","190 ลัง"]]}]},{subzone:"BUNG",customers:[{name:"T2S Trading",ctn:"1 รายการ",items:[["แผ่นกาว / แผ่นปูโต๊ะ (Mat)","3 BOX"]]}]},{subzone:"Eastern",customers:[{name:"Transitions Optical",ctn:"31 ลัง",items:[["ถุงมือ (Glove) - LATEX","31 ลัง"]]}]},{subzone:"NONGKHAM",customers:[{name:"Macsys Industries",ctn:"2 ลัง",items:[["หมวกคลุมผม - สำเร็จรูป (Mop Cap)","2 ลัง"]]},{name:"Trois Takaya Electronics",ctn:"1 ลัง",items:[["ผ้าเช็ด (Wiper) - POLYESTER","1 ลัง"]]}]},{subzone:"",customers:[{name:"Fabrinet",ctn:"65 ลัง",items:[["ถุงมือ (Glove) - NITRILE (2 รายการ)","65 ลัง"]]}]}]},{zone:"RY",subzoneGroups:[{subzone:"Eastern",customers:[{name:"Mitsubishi Chemical Advanced Materials",ctn:"1 รายการ",items:[["LDPE (5 รายการ)","160000 PCS"]]}]},{subzone:"MABYANGPORN",customers:[{name:"Volcano Tec",ctn:"11 ลัง",items:[["ถุงมือ (Glove) - NITRILE (2 รายการ)","11 ลัง"]]}]},{subzone:"Maptaput",customers:[{name:"Covestro",ctn:"1 รายการ",items:[["แผ่นกาว / แผ่นปูโต๊ะ (Mat)","2 BOX"]]}]}]},{zone:"LB",subzoneGroups:[{subzone:"KANHAM",customers:[{name:"NMB - Minebea Thai",ctn:"8 ลัง",items:[["ผ้าเช็ด (Wiper)","8 ลัง"]]}]}]},{zone:"PB",subzoneGroups:[{subzone:"Krathum baen",customers:[{name:"Thai Otsuka Pharmaceutical",ctn:"10 ลัง",items:[["ถุงมือ (Glove) - NITRILE (2 รายการ)","8 ลัง"],["ผ้าเช็ด (Wiper)","2 ลัง"]]}]},{subzone:"SMSK",customers:[{name:"Cal-Comp Electronics",ctn:"4 ลัง",items:[["ถุงมือ (Glove) - LATEX (2 รายการ)","4 ลัง + 20 BOX"]]}]}]},{zone:"BK",subzoneGroups:[{subzone:"Pathumwan",customers:[{name:"Cbre",ctn:"1 รายการ",items:[["แผ่นกาว / แผ่นปูโต๊ะ (Mat)","300 MAT"]]}]}]},{zone:"KR",subzoneGroups:[]},{zone:"OT",subzoneGroups:[]},{zone:"UNMAPPED",subzoneGroups:[{subzone:"",customers:[{name:"Blank_Customer_Name_Need_Review",ctn:"1 รายการ",items:[["","0 –"]]}]}]}];
+function zColor(c){return (ZONE_META[c]&&ZONE_META[c].color)||"var(--text-faint)"}
+function zName(c){return (ZONE_META[c]&&ZONE_META[c].name)||c}
+function ctnWeight(customers){let t=0;customers.forEach(c=>{const m=c.ctn.match(/(\d+)\s*ลัง/);if(m)t+=parseInt(m[1],10)});return t}
+DATA.forEach(z=>{z.allCustomers=z.subzoneGroups.flatMap(g=>g.customers);z.ctnTotal=ctnWeight(z.allCustomers);z.count=z.allCustomers.length});
+const MAX=Math.max(1,...DATA.map(z=>z.ctnTotal));
+const app=document.getElementById("app");
+const sorted=[...DATA].sort((a,b)=>b.ctnTotal-a.ctnTotal);
+sorted.forEach((z,i)=>{
+  const card=document.createElement("div");
+  card.className="zoneCard"+(i===0?" open":"");
+  const pct=Math.round((z.ctnTotal/MAX)*100);
+  card.innerHTML=`
+    <button class="zoneHead" type="button">
+      <div class="zoneChip" style="background:${zColor(z.zone)}">${z.zone}</div>
+      <div class="zoneHeadBody">
+        <div class="zoneName">โซน ${z.zone} · ${zName(z.zone)}</div>
+        <div class="zoneMeta">${z.count?z.count+" ราย":"ไม่มีงานส่ง"}</div>
+      </div>
+      <div class="zoneCTN">${z.ctnTotal||"–"}<small>ลัง</small></div>
+      <div class="chev">▾</div>
+    </button>
+    <div class="zoneBody">
+      ${z.allCustomers.length?z.subzoneGroups.map(g=>`
+        ${z.subzoneGroups.length>1?`<div class="subzoneHead">${g.subzone||"ไม่ระบุพื้นที่"}</div>`:""}
+        ${g.customers.map(c=>`
+          <div class="custRow">
+            <div class="custTop"><div class="custName">${c.name}</div><div class="custCTN">${c.ctn}</div></div>
+            ${c.items.map(it=>`<div class="itemLine">${it[0]}<span class="qty num">${it[1]}</span></div>`).join("")}
+          </div>
+        `).join("")}
+      `).join(""):`<div class="custRow empty">ไม่มีงานจัดส่งวันนี้</div>`}
+    </div>`;
+  card.querySelector(".zoneHead").addEventListener("click",()=>card.classList.toggle("open"));
+  app.appendChild(card);
+});
+</script>
+</body>
+</html>
