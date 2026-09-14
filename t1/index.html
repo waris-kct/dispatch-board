@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dispatch Board — T+1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@600;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FAF6EF;--surface:#FFFFFF;--surface-2:#F1EAD9;--surface-3:#E7DEC9;--border:#E0D5BE;--border-strong:#CBBB98;--text:#211C15;--text-dim:#6E6252;--text-faint:#9C8F79;--accent:#B8730A;--accent-ink:#FFFFFF;--danger:#B3261E;--ok:#1A7F4B;--shadow:0 1px 2px rgba(33,28,21,.06),0 6px 16px -8px rgba(33,28,21,.18);--zone-1:#2E6E62;--zone-2:#4A5FA5;--zone-3:#A5484A;--zone-4:#7A5A9E;--zone-5:#B8730A;--zone-6:#4F7C3C;--zone-7:#A0567E;--zone-8:#3D7A96;--zone-9:#8A6A3D;--zone-10:#8C4F6E;--warn-bg:#FFF1D6;--warn-ink:#9A5B00;--stop-bg:#FDE6E4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1B1712;--surface:#24201A;--surface-2:#2C2620;--surface-3:#362F26;--border:#3B342A;--border-strong:#4C4335;--text:#F3ECDE;--text-dim:#B3A791;--text-faint:#7C7261;--accent:#F5A623;--accent-ink:#1B1712;--danger:#F2726B;--ok:#5CC08B;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 20px -8px rgba(0,0,0,.5);--zone-1:#5BB8A4;--zone-2:#8B9EE8;--zone-3:#E38A83;--zone-4:#B79BE0;--zone-5:#F5A623;--zone-6:#8FC46A;--zone-7:#E093BC;--zone-8:#6FC0E0;--zone-9:#D1A968;--zone-10:#D189A8;--warn-bg:#3A2C0F;--warn-ink:#F5B14A;--stop-bg:#3F1D1B}}
+:root[data-theme="dark"]{--bg:#1B1712;--surface:#24201A;--surface-2:#2C2620;--surface-3:#362F26;--border:#3B342A;--border-strong:#4C4335;--text:#F3ECDE;--text-dim:#B3A791;--text-faint:#7C7261;--accent:#F5A623;--accent-ink:#1B1712;--danger:#F2726B;--ok:#5CC08B;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 20px -8px rgba(0,0,0,.5);--zone-1:#5BB8A4;--zone-2:#8B9EE8;--zone-3:#E38A83;--zone-4:#B79BE0;--zone-5:#F5A623;--zone-6:#8FC46A;--zone-7:#E093BC;--zone-8:#6FC0E0;--zone-9:#D1A968;--zone-10:#D189A8;--warn-bg:#3A2C0F;--warn-ink:#F5B14A;--stop-bg:#3F1D1B}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:"IBM Plex Sans Thai","IBM Plex Sans",system-ui,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:32px}
+button{font:inherit;color:inherit}
+.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:640px;margin:0 auto}
+.topbar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--border);padding:14px 16px 10px}
+.topbar-eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.topbar-title{font-family:"Kanit",sans-serif;font-size:20px;font-weight:700}
+.topbar-sub{color:var(--text-dim);font-size:12.5px;margin-top:2px}
+.topbar-warn{color:var(--danger);font-weight:700}
+.refresh-hint{color:var(--accent);font-size:11.5px;font-weight:600;margin-top:6px}
+.tabs{display:flex;gap:4px;margin-top:10px;padding:3px;background:var(--surface-2);border-radius:12px}
+.tabs button{flex:1;border:none;background:none;padding:8px 4px;border-radius:9px;font-weight:600;font-size:13.5px;color:var(--text-dim);cursor:pointer;min-height:40px}
+.tabs button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.tabs .badge[hidden]{display:none}
+.tabs .badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:9px;background:var(--accent);color:var(--accent-ink);font-size:11px;line-height:18px}
+.zoneCard{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin:10px 16px;overflow:hidden;box-shadow:var(--shadow)}
+.zoneHead{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;background:none;border:none;width:100%;text-align:left}
+.zoneChip{flex-shrink:0;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:"Kanit",sans-serif;font-weight:700;font-size:13px;color:#fff}
+.zoneHeadBody{flex:1;min-width:0}
+.zoneName{font-weight:600;font-size:14.5px}
+.zoneMeta{font-size:12px;color:var(--text-dim);margin-top:1px}
+.zoneCTN{font-family:"Kanit",sans-serif;font-weight:700;font-size:18px;flex-shrink:0;text-align:right}
+.zoneCTN small{display:block;font-family:"IBM Plex Sans Thai",sans-serif;font-weight:500;font-size:10px;color:var(--text-faint);text-align:right}
+.zoneCard.idle{opacity:.55;box-shadow:none}
+.outHead{margin:22px 16px 0;padding-top:12px;border-top:2px dashed var(--border-strong);font-weight:700;font-size:13px;color:var(--text-dim)}
+.zoneCard.outside{border-style:dashed}
+.chev{flex-shrink:0;color:var(--text-faint);transition:transform .18s ease}
+.zoneCard.open .chev{transform:rotate(180deg)}
+.zoneBody{display:none;border-top:1px solid var(--border)}
+.zoneCard.open .zoneBody{display:block}
+.custRow{padding:11px 14px;border-bottom:1px solid var(--border)}
+.custRow:last-child{border-bottom:none}
+.custRow.empty{color:var(--text-faint);font-size:12.5px;text-align:center;padding:16px 14px}
+.custTop{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.custName{font-weight:600;font-size:13.5px}
+.subzoneHead{padding:9px 14px 3px;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--accent);background:var(--surface-2)}
+.custCTN{font-size:12.5px;font-weight:600;color:var(--accent);flex-shrink:0;white-space:nowrap}
+.itemLine{font-size:12px;color:var(--text-dim);margin-top:3px}
+.itemLine .qty{color:var(--text);font-weight:500;float:right;padding-left:8px}
+.farTag{display:inline-block;background:var(--warn-bg);color:var(--warn-ink);font-size:10.5px;font-weight:700;padding:0 6px;margin-left:6px;border-radius:6px;white-space:nowrap;vertical-align:1px}
+.farNote{margin:10px 16px 0;padding:9px 12px;background:var(--warn-bg);color:var(--warn-ink);border-radius:10px;font-size:12.5px;line-height:1.45}
+.footer{padding:16px;text-align:center;color:var(--text-faint);font-size:11px}
+.hero{margin:12px 16px 4px;border-radius:16px;padding:16px 16px 14px;background:var(--surface);border:1px solid var(--border);border-left:6px solid var(--accent);box-shadow:var(--shadow)}
+.hero.warn{border-left-color:#E08A00;background:var(--warn-bg)}
+.hero.stop{border-left-color:var(--danger);background:var(--stop-bg)}
+.heroTop{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.heroNum{font-family:"Kanit",sans-serif;font-weight:800;font-size:64px;line-height:1;color:var(--accent);letter-spacing:-.02em}
+.hero.warn .heroNum{color:var(--warn-ink)}
+.hero.stop .heroNum{color:var(--danger)}
+.heroNum small{font-size:20px;font-weight:600;color:var(--text-dim);margin-left:6px;letter-spacing:0}
+.heroCust{text-align:right;color:var(--text-dim);font-size:12px;line-height:1.2}
+.heroCust b{display:block;font-family:"Kanit",sans-serif;font-size:26px;color:var(--text)}
+.heroOthers{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.heroOthers span{font-family:"Kanit",sans-serif;font-weight:700;font-size:18px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:1px 10px}
+.heroBar{height:8px;border-radius:4px;background:var(--surface-3);margin:14px 0 4px;overflow:hidden}
+.heroBar i{display:block;height:100%;border-radius:4px;background:var(--accent)}
+.hero.warn .heroBar i{background:#E08A00}
+.hero.stop .heroBar i{background:var(--danger)}
+.heroNote{margin-top:10px;font-weight:700;font-size:13.5px;line-height:1.4}
+.hero.ok .heroNote{color:var(--ok)}
+.hero.warn .heroNote{color:var(--warn-ink)}
+.hero.stop .heroNote{color:var(--danger)}
+
+/* ---- dispatch manager view ---- */
+.truckBar{display:none;gap:8px;overflow-x:auto;margin:10px -16px 0;padding:2px 16px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.truckBar::-webkit-scrollbar{display:none}
+body.v-assign .truckBar{display:flex}
+.tChip{flex:0 0 auto;min-width:92px;border:2px solid var(--border-strong);background:var(--surface);border-radius:12px;padding:6px 10px 6px;text-align:left;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
+.tChip b{display:block;font-family:"Kanit",sans-serif;font-size:15px;line-height:1.2;color:var(--c)}
+.tChip span{display:block;font-size:11.5px;color:var(--text-dim)}
+.tChip i{position:absolute;top:-7px;right:-4px;min-width:22px;height:22px;border-radius:11px;background:var(--c);color:#fff;font-style:normal;font-weight:700;font-size:12px;line-height:22px;text-align:center;padding:0 5px}
+.tChip.on{background:var(--c);border-color:var(--c)}
+.tChip.on b,.tChip.on span{color:#fff}
+.tChip.on i{background:#fff;color:var(--c)}
+.view{display:none}
+body.v-overview #viewOverview{display:block}
+body.v-assign #viewAssign{display:block}
+body.v-text #viewText{display:block}
+.assignHint{margin:12px 16px 0;font-size:12.5px;color:var(--text-dim);display:flex;justify-content:space-between;align-items:center;gap:10px}
+.assignHint button{border:1px solid var(--border-strong);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;min-height:32px}
+.assignHint button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.dZone{margin:14px 16px 0;display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
+.dZone .zoneChip{width:30px;height:30px;font-size:11px;border-radius:8px}
+.dZone small{margin-left:auto;font-weight:500;color:var(--text-faint);font-size:11.5px}
+.dSub{margin:8px 16px 0;font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--accent)}
+.dList{margin:6px 16px 0;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.dRow{display:flex;align-items:center;gap:10px;width:100%;min-height:54px;padding:8px 12px;border:none;border-bottom:1px solid var(--border);background:var(--surface);text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;position:relative}
+.dRow:last-child{border-bottom:none}
+.dRow .tick{flex:0 0 24px;height:24px;border-radius:7px;border:2px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:transparent}
+.dRow.on{background:color-mix(in srgb,var(--c) 14%,var(--surface))}
+.dRow.on .tick{background:var(--c);border-color:var(--c);color:#fff}
+.dBody{flex:1;min-width:0}
+.dName{font-weight:600;font-size:14px;line-height:1.3}
+.dMeta{font-size:11.5px;color:var(--text-faint)}
+.dCtn{flex-shrink:0;text-align:right;font-weight:700;font-size:13px;color:var(--accent);white-space:nowrap}
+.dDots{display:flex;gap:3px;margin-top:3px;flex-wrap:wrap}
+.dDots em{font-style:normal;font-size:10.5px;font-weight:700;color:#fff;background:var(--c);border-radius:5px;padding:0 5px}
+.emptyMsg{margin:28px 16px;text-align:center;color:var(--text-faint);font-size:13px}
+.msgTools{display:flex;gap:8px;margin:12px 16px 0}
+.btn{flex:1;border:none;border-radius:12px;padding:11px 10px;font-weight:700;font-size:14px;cursor:pointer;min-height:46px;background:var(--accent);color:var(--accent-ink);-webkit-tap-highlight-color:transparent}
+.btn.alt{background:var(--surface);color:var(--text);border:1px solid var(--border-strong)}
+.btn.line{background:#06C755;color:#fff}
+.btn.small{flex:0 0 auto;padding:6px 12px;font-size:12.5px;min-height:34px;border-radius:9px}
+.msgPre{margin:12px 16px 0;padding:12px 14px;background:var(--surface);border:1px dashed var(--border-strong);border-radius:12px;white-space:pre-wrap;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;line-height:1.55;word-break:break-word}
+.warnBox{margin:12px 16px 0;padding:9px 12px;background:var(--warn-bg);color:var(--warn-ink);border-radius:10px;font-size:12.5px}
+.tCard{margin:12px 16px 0;background:var(--surface);border:1px solid var(--border);border-left:6px solid var(--c);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.tHead{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.tHead b{font-family:"Kanit",sans-serif;font-size:16px;color:var(--c)}
+.tHead span{font-size:12px;color:var(--text-dim)}
+.tHead .grow{flex:1;min-width:0}
+.tHead .sum{font-family:"Kanit",sans-serif;font-weight:700;font-size:17px;text-align:right;line-height:1.1}
+.tHead .sum small{display:block;font-family:"IBM Plex Sans Thai",sans-serif;font-weight:500;font-size:10px;color:var(--text-faint)}
+.tRow{display:flex;align-items:center;gap:6px;padding:6px 8px 6px 12px;border-top:1px solid var(--border);min-height:48px}
+.tRow .no{flex:0 0 18px;font-weight:700;color:var(--text-faint);font-size:12.5px}
+.tRow .al{flex:1;min-width:0}
+.tRow .al b{display:block;font-size:14px;line-height:1.25;cursor:pointer}
+.tRow .al small{display:block;font-size:11px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ib{flex:0 0 36px;height:36px;border:none;background:var(--surface-2);border-radius:9px;font-size:14px;cursor:pointer;color:var(--text-dim);-webkit-tap-highlight-color:transparent}
+.ib:disabled{opacity:.3}
+.splitTag{display:inline-block;background:var(--surface-3);color:var(--text-dim);font-size:10px;font-weight:700;padding:0 5px;border-radius:5px;margin-left:4px;vertical-align:1px}
+.dock{display:none;position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--border-strong);box-shadow:0 -6px 18px rgba(0,0,0,.14);padding-bottom:env(safe-area-inset-bottom)}
+body.v-assign .dock{display:block}
+body.v-assign .topbar-eyebrow,body.v-assign .topbar-sub,body.v-assign .refresh-hint{display:none}
+body.v-assign .topbar-title{font-size:19px}
+body.v-assign .footer{padding-bottom:190px}
+.dockIn{max-width:720px;margin:0 auto;padding:0 16px}
+.dockHead{display:flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.dockHead .dt{flex:1;min-width:0;font-weight:700;font-size:13px;line-height:1.25}
+.dockHead .dt small{display:block;font-weight:500;font-size:11px;color:var(--text-faint)}
+.dockHead .chev{flex:0 0 22px;text-align:center;color:var(--text-dim);font-size:13px}
+.dockHead .btn{min-height:40px;padding:7px 12px;font-size:13px;flex:0 0 auto}
+.dockPre{margin:0 0 10px;padding:8px 12px;background:var(--surface-2);border:1px dashed var(--border-strong);border-radius:10px;white-space:pre-wrap;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;line-height:1.5;word-break:break-word;overflow-y:auto;max-height:13vh}
+.dock.open .dockPre{max-height:52vh}
+.dock.min .dockPre{display:none}
+.othersBtn{display:block;width:calc(100% - 32px);margin:16px 16px 0;padding:10px 12px;border:1px dashed var(--border-strong);background:none;border-radius:12px;color:var(--text-dim);font-size:12.5px;font-weight:600;cursor:pointer;text-align:left}
+.dRow.other{opacity:.72}
+.dRow.other .dName{font-weight:500}
+.splitBtn{flex:0 0 auto;border:1px solid var(--border-strong);background:var(--surface);border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;color:var(--text-dim);cursor:pointer;min-height:30px}
+.kaTag{display:inline-block;background:var(--surface-3);color:var(--text-dim);font-size:10px;font-weight:700;padding:0 5px;border-radius:5px;margin-left:4px;vertical-align:1px}
+body.v-assign .toast{bottom:auto;top:96px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;transition:all .2s;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body class="v-overview">
+<div class="topbar"><div class="wrap">
+<div class="topbar-eyebrow">Dispatch Plan T+1 · แผนจัดส่ง</div>
+<div class="topbar-title">จันทร์ 16 พ.ย. 2026</div>
+<div class="topbar-sub">แผนจัดส่งจริง (T+1)</div>
+<div class="refresh-hint">↻ เห็นวันที่เก่า? กดรีเฟรชหน้าเว็บ</div>
+<div class="tabs" id="tabs" hidden>
+  <button type="button" data-v="overview">ภาพรวม</button>
+  <button type="button" data-v="assign">จัดรถ</button>
+  <button type="button" data-v="text">ข้อความ<span class="badge" id="msgBadge" hidden></span></button>
+</div>
+<div class="truckBar" id="truckBar"></div>
+</div></div>
+
+<div id="viewOverview" class="view">
+  <div class="wrap"><div id="hero"></div><div id="farNote"></div></div>
+  <div id="app" class="wrap"></div>
+</div>
+<div id="viewAssign" class="view"><div class="wrap" id="assign"></div></div>
+<div id="viewText" class="view"><div class="wrap" id="msg"></div></div>
+<div class="footer">อัปเดตล่าสุด 2026-11-14 11:10</div>
+<div class="dock" id="dock"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const ZONE_META={AYT:{name:"อยุธยา",color:"var(--zone-1)"},SPK:{name:"สมุทรปราการ",color:"var(--zone-2)"},CHB:{name:"ชลบุรี",color:"var(--zone-3)"},RYG:{name:"ระยอง",color:"var(--zone-4)"},LBS:{name:"ลพบุรี",color:"var(--zone-6)"},BKK:{name:"กรุงเทพฯ",color:"var(--zone-8)"},KRT:{name:"โคราช",color:"var(--zone-9)"},RBR:{name:"ปริมณฑลตะวันตก",color:"var(--zone-7)"},PRJ:{name:"ปราจีนบุรี",color:"var(--zone-10)"},OT:{name:"อื่นๆ",color:"var(--zone-5)"},AY:{name:"อยุธยา",color:"var(--zone-1)"},SMP:{name:"สมุทรปราการ",color:"var(--zone-2)"},CB:{name:"ชลบุรี",color:"var(--zone-3)"},RY:{name:"ระยอง",color:"var(--zone-4)"},LB:{name:"ลพบุรี",color:"var(--zone-6)"},PB:{name:"ปทุมธานี",color:"var(--zone-7)"},BK:{name:"กรุงเทพฯ",color:"var(--zone-8)"},KR:{name:"โคราช",color:"var(--zone-9)"}};
+const DATA=[{zone:"AYT",outside:false,subzoneGroups:[{subzone:"Bang pa-in",customers:[{name:"Hoya Lens Thailand",ctn:"11 ลัง",items:[["ถุงมือ (Glove) - NITRILE (2 รายการ)","4 ลัง"],["แผ่นกาว / แผ่นปูโต๊ะ (Mat)","2 ลัง"],["ผ้าเช็ด (Wiper) (2 รายการ)","5 ลัง"]]}]},{subzone:"Banglen(NKPT)",customers:[{name:"Qual-Pro",ctn:"4 ลัง",items:[["ถุงมือ (Glove) - NITRILE","4 ลัง"]]}]},{subzone:"CHIANG RAK-NOI",customers:[{name:"NMB - Minebea Thai",al:"NMB-AYT",ctn:"44 ลัง",items:[["อุปกรณ์ ESD (ESD Accessories)","100 PCS"],["ถุงมือ (Glove) - NITRILE (5 รายการ)","39 ลัง"],["ผ้าเช็ด Non-Woven (Wiper - NW)","1 ลัง"],["ลูกกลิ้งกาว (Sticky Roller)","20 ROLL"],["หน้ากากอนามัย (Face Mask) - 2PLY","2 ลัง"],["ผ้าเช็ด (Wiper) - POLYESTER","2 ลัง"]]}]},{subzone:"KANHAM",customers:[{name:"Fujikura Electronics",ctn:"6 ลัง",items:[["น้ำยาทำความสะอาด (Cleaner)","6 BTL"],["หน้ากากอนามัย (Face Mask) - 3PLY","6 ลัง"]]}]},{subzone:"Klongluang",customers:[{name:"Belton Industrial",ctn:"62 ลัง",items:[["ถุงมือ (Glove) - NITRILE (5 รายการ)","60 ลัง"],["ลูกกลิ้งกาว (Sticky Roller)","100 ROLL"],["ผ้าเช็ด (Wiper) - POLYESTER","2 ลัง"]]},{name:"Fabrinet",ctn:"10 ลัง",items:[["ถุงมือ (Glove) - NITRILE","10 ลัง"]]}]},{subzone:"Nava",customers:[{name:"Vallen",far:true,prov:"กรุงเทพฯ",ctn:"1 ลัง",items:[["กระดาษคลีนรูม A3/A4 (Cleanroom Paper)","1 ลัง"]]}]},{subzone:"RANGSIT",customers:[{name:"Nidec Electronics",ctn:"6 ลัง",items:[["แผ่นกาว / แผ่นปูโต๊ะ (Mat)","5 ลัง"],["หน้ากากอนามัย (Face Mask) - CARBON","1 ลัง"]]}]},{subzone:"THANU",customers:[{name:"Daido Electronics",ctn:"1 ลัง",items:[["แผ่นกาว / แผ่นปูโต๊ะ (Mat)","1 ลัง"]]},{name:"Iscm Technology",ctn:"7 ลัง",items:[["ผ้าเช็ด (Wiper) - POLYESTER","7 ลัง"]]}]}]},{zone:"SPK",outside:false,subzoneGroups:[{subzone:"",customers:[{name:"Innovative Consultant And Engineering",ctn:"1 ลัง",items:[["แผ่นกาว / แผ่นปูโต๊ะ (Mat)","4 CARTON"],["ผ้าเช็ด Laser Premium (Wiper - Premium) - POLYESTER","1 ลัง"]]}]}]},{zone:"CHB",outside:false,subzoneGroups:[{subzone:"BANBUENG",customers:[{name:"Optimus Packaging",ctn:"1 ลัง",items:[["ผ้าเช็ด (Wiper) - POLYESTER","1 ลัง"]]}]},{subzone:"KHAO KHAN SONG",customers:[{name:"First Material Science",ctn:"5 ลัง",items:[["ถุงมือ (Glove)","6000 PRS"],["ถุงมือ (Glove) - NITRILE","5 ลัง"]]},{name:"Taiwan Union Technology",ctn:"41 ลัง",items:[["ถุงมือ (Glove) - NITRILE (2 รายการ)","25 BOX + 6 ลัง"],["ถุงมือ (Glove) - LATEX (3 รายการ)","25 ลัง"],["ชุดคลีนรูม / เสื้อผ้า (Garment) (2 รายการ)","120 PCS"],["หมวกคลุมผม - สำเร็จรูป (Mop Cap)","10 ลัง"]]}]},{subzone:"Klongluang",customers:[{name:"Fabrinet",far:true,prov:"ปทุมธานี",ctn:"85 ลัง",items:[["ถุงมือ (Glove) - NITRILE (3 รายการ)","85 ลัง"]]}]},{subzone:"NONG CHAK",customers:[{name:"Sam Precision",ctn:"45 ลัง",items:[["ถุงมือ (Glove) - NITRILE (2 รายการ)","33 ลัง"],["หมวกคลุมผม - สำเร็จรูป (Mop Cap)","12 ลัง"]]}]},{subzone:"Sriracha",customers:[{name:"Celestica",ctn:"107 ลัง",items:[["ถุงมือ (Glove) - LATEX","10 ลัง"],["ถุงมือ (Glove) - CARBON","67 ลัง"],["ถุงมือ (Glove)","2 PRS"],["ถุงมือ (Glove) - NITRILE","30 ลัง"]]}]}]},{zone:"RYG",outside:false,subzoneGroups:[{subzone:"MABYANGPORN",customers:[{name:"Volcano Tec",ctn:"1 ลัง",items:[["แผ่นกาว / แผ่นปูโต๊ะ (Mat)","1 ลัง"]]}]},{subzone:"NIKHOM PHATTHANA",customers:[{name:"Thaile Semiconductor",ctn:"10 ลัง",items:[["ถุงมือ (Glove) - NITRILE","10 ลัง"]]}]},{subzone:"TASIT",customers:[{name:"Misumi",ctn:"1 รายการ",items:[["ผ้าเช็ด (Wiper) - POLYESTER","0 –"]]}]}]},{zone:"LBS",outside:false,subzoneGroups:[]},{zone:"BKK",outside:false,subzoneGroups:[{subzone:"Banglen(NKPT)",customers:[{name:"C.C.S. Advance Tech",ctn:"1 รายการ",items:[["ชุดคลีนรูม / เสื้อผ้า (Garment) (4 รายการ)","74 PCS"]]}]}]},{zone:"KRT",outside:false,subzoneGroups:[{subzone:"Nava",customers:[{name:"Vallen",ctn:"20 ลัง",items:[["หน้ากากอนามัย (Face Mask) - 3PLY","20 ลัง"]]}]},{subzone:"Soongnuen",customers:[{name:"Mclean Technologies Co.,Ltd",ctn:"18 ลัง",items:[["ถุงมือ (Glove) - NITRILE (5 รายการ)","15 ลัง"],["หมวกคลุมผม - สำเร็จรูป (Mop Cap)","3 ลัง"]]}]}]},{zone:"RBR",outside:false,subzoneGroups:[]},{zone:"PRJ",outside:false,subzoneGroups:[{subzone:"KANHAM",customers:[{name:"Fujikura Electronics",ctn:"3 ลัง",items:[["น้ำยาทำความสะอาด (Cleaner)","2 BTL"],["หน้ากากอนามัย (Face Mask) - 3PLY","3 ลัง"]]}]}]},{zone:"OT",outside:true,subzoneGroups:[{subzone:"Overseas",customers:[{name:"Hoya Laos",ctn:"2 ลัง",items:[["ชุดคลีนรูม / เสื้อผ้า (Garment)","3840 PCS"],["แผ่นกาว / แผ่นปูโต๊ะ (Mat)","2 ลัง"]]}]}]},{zone:"OTNE",outside:true,subzoneGroups:[{subzone:"MUANGWAN",customers:[{name:"Panasonic Manufacturing",ctn:"3 ลัง",items:[["ผ้าเช็ด Non-Woven (Wiper - NW) (2 รายการ)","3 ลัง"]]}]}]}];
+const CFG={"dispatch":true,"dateKey":"2026-11-16","dateShort":"16-11-26","fleet":[{"id":"9528","plate":"บษ9528","driver":"นพรัตน์"},{"id":"8643","plate":"บษ8643","driver":"ปิยะ"},{"id":"9770","plate":"83-9770","driver":"วิทยา"},{"id":"67","plate":"บห67","driver":"ดนุวัศ"},{"id":"6248","plate":"บษ6248","driver":"อดิศักดิ์"}],"aliases":[["VANTIVE","VANTIVE"],["ACUSHNET","ACUSHNET"],["VISTEON","VISTEON"],["CARDINAL","CARDINAL"],["MITSUBISHI","MITSU-E"],["TRANSITIONS","TRANSITION"],["TAIWAN UNION","TAIWAN"],["MACSYS","MACSYS"],["OPTIMUS","OPTIMUS"],["FUJIKURA","FUJI"],["NIDEC","NIDEC-K7"],["SYSTEM PART","SYSTEM PART"],["BELTON","BELTON-R"],["ABRASIVE","ABRASIVE"],["BIONET","BIONET"],["WESTERN DIGITAL","WD"]]};
+const TOTAL_CTN=489,TOTAL_CUST=24,CAP_WARN=400,CAP_LIMIT=500;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const zColor=c=>(ZONE_META[c]&&ZONE_META[c].color)||"var(--text-faint)";
+const zName=c=>(ZONE_META[c]&&ZONE_META[c].name)||c;
+const ctnNum=s=>{const m=String(s).match(/(\d+)\s*ลัง/);return m?parseInt(m[1],10):0};
+const fmt=n=>(Math.round(n*100)/100).toLocaleString("en-US");
+const unitParts=customers=>{const u={};customers.forEach(c=>c.items.forEach(it=>{String(it[1]).split(" + ").forEach(p=>{const m=p.match(/^([\d.]+)\s*(.*)$/);if(m&&m[2]&&m[2]!=="ลัง"){u[m[2]]=(u[m[2]]||0)+parseFloat(m[1])}})}));return u};
+DATA.forEach(z=>{z.allCustomers=z.subzoneGroups.flatMap(g=>g.customers);z.ctnTotal=z.allCustomers.reduce((t,c)=>t+ctnNum(c.ctn),0);z.count=z.allCustomers.length;z.others=Object.entries(unitParts(z.allCustomers)).map(([k,v])=>fmt(v)+" "+k);z.farCount=z.allCustomers.filter(c=>c.far).length});
+const MAX=Math.max(1,...DATA.map(z=>z.ctnTotal));
+const farTag=c=>c.far?`<span class="farTag">ไกลกลุ่ม${c.prov?" · จ."+esc(c.prov):""}</span>`:"";
+
+/* ---------- OM overview: hero + collapsible zone cards ---------- */
+(function(){
+  const others=Object.entries(unitParts(DATA.filter(z=>!z.outside).flatMap(z=>z.allCustomers))).sort((a,b)=>b[1]-a[1]);
+  const lvl=TOTAL_CTN>=CAP_LIMIT?"stop":(TOTAL_CTN>=CAP_WARN?"warn":"ok");
+  const left=Math.max(0,CAP_LIMIT-TOTAL_CTN);
+  const note=lvl==="stop"?"ถึงเพดาน หยุดคีย์ · ขอให้หยุดคีย์ออเดอร์ส่งเพิ่ม และสื่อสารกันในทีมก่อน":(lvl==="warn"?"ใกล้เต็ม · เหลือประมาณ "+left+" ลัง โปรดสื่อสารกันก่อนคีย์เพิ่ม":"ยังคีย์ได้ · เหลือประมาณ "+left+" ลัง คีย์เพิ่มได้");
+  const pct=Math.max(1,Math.min(100,TOTAL_CTN/CAP_LIMIT*100));
+  document.getElementById("hero").innerHTML=`<div class="hero ${lvl}">
+    <div class="heroTop"><div class="heroNum">${fmt(TOTAL_CTN)}<small>/ ${CAP_LIMIT} ลัง</small></div><div class="heroCust"><b>${TOTAL_CUST}</b>ลูกค้า</div></div>
+    ${others.length?`<div class="heroOthers">${others.map(o=>`<span>+ ${fmt(o[1])} ${esc(o[0])}</span>`).join("")}</div>`:""}
+    <div class="heroBar"><i style="width:${pct}%"></i></div>
+    <div class="heroNote">${note}</div>
+  </div>`;
+  const far=DATA.filter(z=>!z.outside&&z.farCount>0);
+  if(far.length){const n=far.reduce((t,z)=>t+z.farCount,0);document.getElementById("farNote").innerHTML=`<div class="farNote"><b>⚠ มีลูกค้าไกลจากกลุ่มหลัก ${n} ราย</b> ใน ${far.map(z=>z.zone).join(", ")} ถ้าวันนี้ต้องส่งหลายรายพร้อมกัน ลองดูว่าควรแยกเที่ยวหรือปรับลำดับงานของวัน<br><span style="opacity:.8">ไกลกลุ่ม = อยู่คนละจังหวัดกับกลุ่มหลักของโซนในวันนั้น (ประเมินจากจังหวัด ยังไม่ใช่ระยะทางจริง)</span></div>`}
+})();
+const app=document.getElementById("app");
+const byCount=(a,b)=>((b.count>0)-(a.count>0))||(b.ctnTotal-a.ctnTotal);
+const mainZones=DATA.filter(z=>!z.outside).sort(byCount);
+const outZones=DATA.filter(z=>z.outside&&z.count>0).sort(byCount);
+let outHeadAdded=false;
+[...mainZones,...outZones].forEach((z,i)=>{
+  if(z.outside&&!outHeadAdded){outHeadAdded=true;const h=document.createElement("div");h.className="outHead";h.textContent="นอกเส้นทางหลัก (OT / ต่างประเทศ) — แสดงไว้ ไม่นับรวมในยอดด้านบน";app.appendChild(h)}
+  const card=document.createElement("div");
+  card.className="zoneCard"+((i===0||(z.count>0&&z.ctnTotal===0))?" open":"")+(z.count?"":" idle")+(z.outside?" outside":"");
+  card.innerHTML=`
+    <button class="zoneHead" type="button">
+      <div class="zoneChip" style="background:${zColor(z.zone)}">${esc(z.zone)}</div>
+      <div class="zoneHeadBody">
+        <div class="zoneName">โซน ${esc(z.zone)} · ${esc(zName(z.zone))}</div>
+        <div class="zoneMeta">${z.count?z.count+" ราย"+(z.farCount?" · ⚠ ไกลกลุ่ม "+z.farCount+" ราย":"")+(z.others.length&&z.ctnTotal?" · +"+esc(z.others.join(", ")):""):"ไม่มีงานส่ง"}</div>
+      </div>
+      <div class="zoneCTN">${z.ctnTotal?z.ctnTotal+"<small>"+(z.outside?"ลัง · ไม่นับรวม":"ลัง")+"</small>":(z.others.length?esc(z.others.join(" · "))+"<small>ไม่ใช่ลัง</small>":"–<small>ลัง</small>")}</div>
+      <div class="chev">▾</div>
+    </button>
+    <div class="zoneBody">
+      ${z.allCustomers.length?z.subzoneGroups.map(g=>`
+        ${z.subzoneGroups.length>1?`<div class="subzoneHead">${esc(g.subzone||"ไม่ระบุพื้นที่")}</div>`:""}
+        ${g.customers.map(c=>`
+          <div class="custRow">
+            <div class="custTop"><div class="custName">${esc(c.name)}${farTag(c)}</div><div class="custCTN">${esc(c.ctn)}</div></div>
+            ${c.items.map(it=>`<div class="itemLine">${esc(it[0])}<span class="qty num">${esc(it[1])}</span></div>`).join("")}
+          </div>
+        `).join("")}
+      `).join(""):`<div class="custRow empty">ไม่มีงานจัดส่งวันนี้</div>`}
+    </div>`;
+  card.querySelector(".zoneHead").addEventListener("click",()=>card.classList.toggle("open"));
+  app.appendChild(card);
+});
+
+/* ---------- tabs + dispatch manager view ---------- */
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const toastEl=document.getElementById("toast");let toastTimer;
+function toast(t){toastEl.textContent=t;toastEl.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove("show"),1600)}
+function setView(v){document.body.className="v-"+v;document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));window.scrollTo(0,0);if(CFG.dispatch){S.tab=v;save()}}
+let S={order:{},active:null,filter:"all",tab:"overview"},ALIAS={};
+const KEY="dispatch-v2:"+CFG.dateKey,AKEY="dispatch-v2:alias";
+const FLEET=(CFG.fleet||[]).map((t,i)=>Object.assign({color:["var(--zone-1)","var(--zone-2)","var(--zone-3)","var(--zone-4)","var(--zone-6)","var(--zone-8)"][i%6],short:(String(t.plate).match(/\d+$/)||[t.plate])[0]},t));
+const CUSTS=[],CBY={};
+DATA.filter(z=>!z.outside).forEach(z=>z.subzoneGroups.forEach(g=>g.customers.forEach(c=>{const o={id:z.zone+"|"+c.name,zone:z.zone,sub:g.subzone,name:c.name,ctn:c.ctn,n:ctnNum(c.ctn),far:c.far,prov:c.prov,al:c.al};CUSTS.push(o);CBY[o.id]=o})));
+const save=()=>store.set(KEY,S);
+const fleetBy=id=>FLEET.find(t=>t.id===id);
+const trucksOf=id=>FLEET.filter(t=>(S.order[t.id]||[]).includes(id));
+function autoAlias(c){const seed=(CFG.aliases||[]).find(a=>c.name.toUpperCase().includes(a[0]));if(seed)return seed[1];const w=c.name.replace(/[^A-Za-z0-9&฀-๿ ]/g," ").trim().split(/\s+/)[0]||c.name;return w.toUpperCase()}
+const aliasOf=c=>ALIAS[c.id]||c.al||autoAlias(c);
+
+/* one customer = one drop = one truck. Only big KA customers may be put on a 2nd truck (config splitOk, else this default list) */
+const SPLIT_OK=(CFG.splitOk&&CFG.splitOk.length?CFG.splitOk:["WD","WESTERN DIGITAL","VALLEN","MISUMI","BELTON"]).map(s=>String(s).toUpperCase());
+const canSplit=c=>{const n=c.name.toUpperCase();return SPLIT_OK.some(k=>k.length<=3?new RegExp("(^|[^A-Z0-9])"+k+"([^A-Z0-9]|$)").test(n):n.includes(k))||SPLIT_OK.includes(aliasOf(c).toUpperCase())};
+let othersOpen=false;
+function toggleCust(id){
+  const t=S.active;if(!t)return;
+  const arr=S.order[t]=S.order[t]||[];const i=arr.indexOf(id);
+  if(i>=0)arr.splice(i,1);else arr.push(id);
+  save();renderAssign();updateBadges();
+  try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}
+}
+function moveCust(id){
+  const t=S.active;if(!t)return;
+  FLEET.forEach(f=>{S.order[f.id]=(S.order[f.id]||[]).filter(x=>x!==id)});
+  (S.order[t]=S.order[t]||[]).push(id);
+  save();renderAssign();updateBadges();toast("ย้ายมา "+fleetBy(t).plate+" แล้ว");
+}
+function addSplit(id){
+  const t=S.active;if(!t)return;
+  const arr=S.order[t]=S.order[t]||[];if(!arr.includes(id))arr.push(id);
+  save();renderAssign();updateBadges();toast("แบ่งรถ: เพิ่มใน "+fleetBy(t).plate);
+}
+function renderTruckBar(){
+  document.getElementById("truckBar").innerHTML=FLEET.map(t=>`<button type="button" class="tChip ${S.active===t.id?"on":""}" data-t="${esc(t.id)}" style="--c:${t.color}"><b>${esc(t.plate)}</b><span>${esc(t.driver)}</span>${(S.order[t.id]||[]).length?`<i>${S.order[t.id].length}</i>`:""}</button>`).join("");
+  document.querySelectorAll("#truckBar .tChip").forEach(b=>b.addEventListener("click",()=>{S.active=b.dataset.t;save();renderAssign()}));
+}
+function renderAssign(){
+  renderTruckBar();
+  const act=fleetBy(S.active);
+  const done=CUSTS.filter(c=>trucksOf(c.id).length).length;
+  const mine=c=>{const ts=trucksOf(c.id);return !ts.length||(act&&ts.some(t=>t.id===act.id))||canSplit(c)};
+  const list=S.filter==="open"?CUSTS.filter(c=>!trucksOf(c.id).length):CUSTS.filter(mine);
+  const others=S.filter==="open"?[]:CUSTS.filter(c=>!mine(c));
+  let h=`<div class="assignHint"><span>แตะชื่อลูกค้าเพื่อใส่/เอาออกจาก <b style="color:${act?act.color:"inherit"}">${act?esc(act.plate+" "+act.driver):"-"}</b> · จัดแล้ว <b>${done}/${CUSTS.length}</b></span><button type="button" id="fOpen" class="${S.filter==="open"?"on":""}">ยังไม่จัด ${CUSTS.length-done}</button></div>`;
+  const zones=[...new Set(list.map(c=>c.zone))];
+  const order=[...mainZones.map(z=>z.zone)];zones.sort((a,b)=>order.indexOf(a)-order.indexOf(b));
+  zones.forEach(zc=>{
+    const zs=list.filter(c=>c.zone===zc);
+    h+=`<div class="dZone"><div class="zoneChip" style="background:${zColor(zc)}">${esc(zc)}</div><span>${esc(zName(zc))}</span><small>${zs.length} ราย</small></div>`;
+    const subs=[...new Set(zs.map(c=>c.sub))];
+    subs.forEach(sb=>{
+      if(subs.length>1)h+=`<div class="dSub">${esc(sb||"ไม่ระบุพื้นที่")}</div>`;
+      h+=`<div class="dList">`+zs.filter(c=>c.sub===sb).map(c=>{
+        const ts=trucksOf(c.id);const on=act&&ts.some(t=>t.id===act.id);
+        return `<button type="button" class="dRow ${on?"on":""}" data-id="${esc(c.id)}" style="--c:${act?act.color:"var(--accent)"}"><span class="tick">✓</span><span class="dBody"><span class="dName">${esc(c.name)}${farTag(c)}${canSplit(c)?`<span class="kaTag">KA</span>`:""}</span>${ts.length?`<span class="dDots">${ts.map(t=>`<em style="--c:${t.color}">${esc(t.short)}</em>`).join("")}</span>`:""}</span><span class="dCtn">${esc(c.ctn)}</span></button>`}).join("")+`</div>`;
+    });
+  });
+  if(!list.length)h+=`<div class="emptyMsg">${CUSTS.length?(others.length?"ไม่มีรายที่ว่างให้จัด":"จัดครบทุกรายแล้ว 🎉"):"ไม่มีงานจัดส่ง"}</div>`;
+  if(others.length){
+    h+=`<button type="button" class="othersBtn" id="othersBtn">${othersOpen?"▾":"▸"} จัดให้รถคันอื่นแล้ว ${others.length} ราย <span style="font-weight:400">(แตะชื่อเพื่อย้ายมาคันนี้)</span></button>`;
+    if(othersOpen)h+=`<div class="dList">`+others.map(c=>{const ts=trucksOf(c.id);
+      return `<button type="button" class="dRow other" data-mv="${esc(c.id)}" style="--c:${act?act.color:"var(--accent)"}"><span class="dBody"><span class="dName">${esc(c.name)}${farTag(c)}</span><span class="dDots">${ts.map(t=>`<em style="--c:${t.color}">${esc(t.short)}</em>`).join("")}</span></span><span class="dCtn">${esc(c.ctn)}</span><span class="splitBtn" data-sp="${esc(c.id)}">+แบ่งรถ</span></button>`}).join("")+`</div>`;
+  }
+  const el=document.getElementById("assign");el.innerHTML=h;
+  el.querySelectorAll(".dRow:not(.other)").forEach(b=>b.addEventListener("click",()=>toggleCust(b.dataset.id)));
+  el.querySelectorAll(".dRow.other").forEach(b=>b.addEventListener("click",e=>{const sp=e.target.closest("[data-sp]");if(sp)addSplit(sp.dataset.sp);else moveCust(b.dataset.mv)}));
+  const ob=document.getElementById("othersBtn");if(ob)ob.addEventListener("click",()=>{othersOpen=!othersOpen;renderAssign()});
+  renderDock();
+  const fo=document.getElementById("fOpen");if(fo)fo.addEventListener("click",()=>{S.filter=S.filter==="open"?"all":"open";save();renderAssign()});
+}
+
+function buildText(){
+  const split={};CUSTS.forEach(c=>{const ts=trucksOf(c.id);if(ts.length>1)split[c.id]=ts});
+  const tl=t=>t.plate+" "+t.driver;
+  const blocks=[];
+  FLEET.forEach(t=>{const ids=(S.order[t.id]||[]).filter(id=>CBY[id]&&!split[id]);if(ids.length)blocks.push(ids.map((id,i)=>(i+1)+aliasOf(CBY[id])).concat([tl(t)]).join("\n"))});
+  const groups={};Object.keys(split).forEach(id=>{const k=split[id].map(t=>t.id).join(",");(groups[k]=groups[k]||[]).push(id)});
+  Object.keys(groups).forEach(k=>blocks.push(groups[k].map((id,i)=>(i+1)+aliasOf(CBY[id])).concat(k.split(",").map(x=>tl(fleetBy(x)))).join("\n")));
+  return blocks.length?CFG.dateShort+"\n"+blocks.join("\n\n"):"";
+}
+/* live LINE text docked under the assign list: peek -> open -> min -> peek */
+function renderDock(){
+  const el=document.getElementById("dock");if(!el)return;
+  const text=buildText();
+  const used=FLEET.filter(t=>(S.order[t.id]||[]).length).length;
+  const asg=CUSTS.filter(c=>trucksOf(c.id).length).length;
+  const left=CUSTS.length-asg;
+  const mode=S.dock||"peek";
+  el.className="dock "+mode;
+  el.innerHTML=`<div class="dockIn"><div class="dockHead" id="dockHead"><div class="dt">ข้อความ LINE<small>${text?used+" คัน · "+asg+" ราย"+(left?" · เหลือ "+left:" · ครบแล้ว"):"ยังไม่ได้จัดรถ — แตะชื่อลูกค้าด้านบน"}</small></div>${text?`<button class="btn small" id="dkCp" type="button">คัดลอก</button><button class="btn small line" id="dkLn" type="button">LINE</button>`:""}<span class="chev">${mode==="min"?"▲":"▼"}</span></div>${text?`<div class="dockPre">${esc(text)}</div>`:""}</div>`;
+  document.getElementById("dockHead").addEventListener("click",e=>{if(e.target.closest("button"))return;S.dock=mode==="peek"?"open":mode==="open"?"min":"peek";save();renderDock()});
+  const cp=document.getElementById("dkCp");if(cp)cp.addEventListener("click",()=>copyText(text));
+  const ln=document.getElementById("dkLn");if(ln)ln.addEventListener("click",()=>{window.location.href="https://line.me/R/share?text="+encodeURIComponent(text)});
+}
+async function copyText(t){
+  try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy")}catch(_){}a.remove()}
+  toast("คัดลอกแล้ว")
+}
+function move(tid,i,d){const a=S.order[tid];const j=i+d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];save();renderText()}
+function renderText(){
+  const el=document.getElementById("msg");
+  const unassigned=CUSTS.filter(c=>!trucksOf(c.id).length);
+  const text=buildText();
+  let h="";
+  if(!text){el.innerHTML=`<div class="emptyMsg">ยังไม่ได้จัดรถ<br>ไปที่แท็บ “จัดรถ” แล้วแตะชื่อลูกค้าใส่รถแต่ละคัน</div>`;return}
+  if(unassigned.length)h+=`<div class="warnBox">ยังไม่ได้จัด ${unassigned.length} ราย: ${esc(unassigned.map(c=>aliasOf(c)).join(", "))}</div>`;
+  const seen={},dup=new Set();CUSTS.filter(c=>trucksOf(c.id).length).forEach(c=>{const a=aliasOf(c);if(seen[a])dup.add(a);seen[a]=1});
+  if(dup.size)h+=`<div class="warnBox">ชื่อย่อซ้ำ: ${esc([...dup].join(", "))} — แตะชื่อย่อด้านล่างเพื่อแก้ให้ต่างกัน</div>`;
+  h+=`<div class="msgTools"><button class="btn" id="cpAll" type="button">คัดลอกทั้งหมด</button><button class="btn line" id="lnAll" type="button">ส่งเข้า LINE</button></div>`;
+  h+=`<div class="msgPre" id="pre">${esc(text)}</div>`;
+  FLEET.forEach(t=>{
+    const ids=(S.order[t.id]||[]).filter(id=>CBY[id]);if(!ids.length)return;
+    const sum=ids.filter(id=>trucksOf(id).length===1).reduce((a,id)=>a+CBY[id].n,0);const sp=ids.filter(id=>trucksOf(id).length>1).length;
+    h+=`<div class="tCard" style="--c:${t.color}"><div class="tHead"><div class="grow"><b>${esc(t.plate)}</b> <span>${esc(t.driver)}</span></div><div class="sum">${sum}<small>ลัง${sp?" · แบ่งรถ "+sp+" ราย":""}</small></div><button class="btn small alt cp" data-t="${esc(t.id)}" type="button">คัดลอก</button></div>`;
+    ids.forEach((id,i)=>{const c=CBY[id];h+=`<div class="tRow"><span class="no">${i+1}</span><div class="al"><b data-al="${esc(id)}">${esc(aliasOf(c))}${trucksOf(id).length>1?`<span class="splitTag">แบ่งรถ</span>`:""}${c.far?`<span class="farTag">ไกลกลุ่ม</span>`:""}</b><small>${esc(c.name)} · ${esc(c.ctn)}</small></div><button class="ib" data-up="${esc(t.id)}|${i}" ${i===0?"disabled":""} type="button">▲</button><button class="ib" data-dn="${esc(t.id)}|${i}" ${i===ids.length-1?"disabled":""} type="button">▼</button><button class="ib" data-rm="${esc(t.id)}|${esc(id)}" type="button">✕</button></div>`});
+    h+=`</div>`;
+  });
+  h+=`<div class="warnBox" style="background:var(--surface-2);color:var(--text-dim)">แตะชื่อย่อเพื่อแก้ (จำไว้ในเครื่องนี้) · ลูกค้าที่ใส่หลายคันจะรวมไว้บล็อกท้ายข้อความเหมือนที่พิมพ์เอง</div>`;
+  el.innerHTML=h;
+  document.getElementById("cpAll").addEventListener("click",()=>copyText(text));
+  document.getElementById("lnAll").addEventListener("click",()=>{window.location.href="https://line.me/R/share?text="+encodeURIComponent(text)});
+  el.querySelectorAll(".cp").forEach(b=>b.addEventListener("click",()=>{const t=fleetBy(b.dataset.t);const ids=(S.order[t.id]||[]).filter(id=>CBY[id]&&trucksOf(id).length===1);copyText(ids.map((id,i)=>(i+1)+aliasOf(CBY[id])).concat([t.plate+" "+t.driver]).join("\n"))}));
+  el.querySelectorAll("[data-up]").forEach(b=>b.addEventListener("click",()=>{const [t,i]=b.dataset.up.split("|");move(t,+i,-1)}));
+  el.querySelectorAll("[data-dn]").forEach(b=>b.addEventListener("click",()=>{const [t,i]=b.dataset.dn.split("|");move(t,+i,1)}));
+  el.querySelectorAll("[data-rm]").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.rm.indexOf("|");const t=b.dataset.rm.slice(0,k),id=b.dataset.rm.slice(k+1);S.order[t]=(S.order[t]||[]).filter(x=>x!==id);save();renderText();updateBadges()}));
+  el.querySelectorAll("[data-al]").forEach(b=>b.addEventListener("click",()=>{const c=CBY[b.dataset.al];const v=prompt("ชื่อย่อสำหรับ "+c.name,aliasOf(c));if(v&&v.trim()){ALIAS[c.id]=v.trim().toUpperCase();store.set(AKEY,ALIAS);renderText()}}));
+}
+function updateBadges(){const n=FLEET.reduce((t,f)=>t+(S.order[f.id]||[]).length,0);const b=document.getElementById("msgBadge");b.hidden=!n;b.textContent=n}
+
+if(CFG.dispatch&&FLEET.length){
+  S=Object.assign(S,store.get(KEY)||{});ALIAS=store.get(AKEY)||{};
+  Object.keys(S.order).forEach(t=>{S.order[t]=(S.order[t]||[]).filter(id=>CBY[id])});
+  if(!fleetBy(S.active))S.active=FLEET[0].id;
+  document.getElementById("tabs").hidden=false;
+  document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.v==="assign")renderAssign();if(b.dataset.v==="text")renderText();setView(b.dataset.v)}));
+  updateBadges();
+  const start=S.tab&&["overview","assign","text"].includes(S.tab)?S.tab:"overview";
+  if(start==="assign")renderAssign();if(start==="text")renderText();
+  setView(start);
+}else{setView("overview")}
+</script>
+</body>
+</html>
